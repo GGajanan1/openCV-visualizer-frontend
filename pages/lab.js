@@ -12,13 +12,22 @@ const Lab = () => {
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     setDarkMode(savedDarkMode);
 
-    axios.get(`${process.env.BACKEND_URL}/filters`, {
+    axios.get('/api/filters', {
       headers: {
         'Accept': 'application/json',
       },
     })
       .then(response => setFilters(response.data.categories))
-      .catch(error => console.error('Error fetching filters:', error));
+      .catch(error => {
+        console.error('Error fetching filters:', error);
+        console.error('Status:', error.response?.status);
+        console.error('Status Text:', error.response?.statusText);
+        console.error('URL:', '/api/filters');
+        console.error('Headers:', error.config?.headers);
+        if (error.response?.data) {
+          console.error('Response Data:', error.response.data);
+        }
+      });
   }, []);
 
   useEffect(() => {

@@ -17,13 +17,22 @@ const Home = () => {
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     setDarkMode(savedDarkMode);
 
-    axios.get(`${process.env.BACKEND_URL}/filters`, {
+    axios.get('/api/filters', {
       headers: {
         'Accept': 'application/json',
       },
     })
       .then(response => setFilters(response.data.categories))
-      .catch(error => console.error('Error fetching filters:', error));
+      .catch(error => {
+        console.error('Error fetching filters:', error);
+        console.error('Status:', error.response?.status);
+        console.error('Status Text:', error.response?.statusText);
+        console.error('URL:', '/api/filters');
+        console.error('Headers:', error.config?.headers);
+        if (error.response?.data) {
+          console.error('Response Data:', error.response.data);
+        }
+      });
   }, []);
 
   useEffect(() => {
@@ -41,7 +50,7 @@ const Home = () => {
     setDarkMode(!darkMode);
   };
 
-  const handleFilterSelect = (filterName, params) => {
+  const handleFilterSelect = async (filterName, params) => {
     if (!image && workflow.length === 0) {
       console.error('No image uploaded');
       return;
@@ -58,27 +67,30 @@ const Home = () => {
       formData.append('params', JSON.stringify(params));
       formData.append('previous_image', previousImage);
 
-      axios.post(`${process.env.BACKEND_URL}/process-workflow-image`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Accept': 'application/json',
-        },
-      })
-        .then(response => {
-          const processedImage = `data:image/png;base64,${response.data.image}`;
-          const code = response.data.code;
+      try {
+        const response = await axios.post('/api/process-workflow-image', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
+          },
+        });
 
-          // Add to workflow
-          setWorkflow(prev => [...prev, {
-            id: Date.now(),
-            filter: filterName,
-            image: processedImage,
-            code: code,
-            description: getFilterDescription(filterName),
-            parameters: params
-          }]);
-        })
-        .catch(error => console.error('Error processing workflow image:', error));
+        const processedImage = `data:image/png;base64,${response.data.image}`;
+        const code = response.data.code;
+
+        // Add to workflow
+        setWorkflow(prev => [...prev, {
+          id: Date.now(),
+          filter: filterName,
+          image: processedImage,
+          code: code,
+          description: getFilterDescription(filterName),
+          parameters: params
+        }]);
+      } catch (error) {
+        console.error('Error processing workflow image:', error);
+        throw error; // Re-throw to handle in Sidebar
+      }
     } else {
       // Apply filter to original uploaded image
       const formData = new FormData();
@@ -86,27 +98,30 @@ const Home = () => {
       formData.append('filter_name', filterName);
       formData.append('params', JSON.stringify(params));
 
-      axios.post(`${process.env.BACKEND_URL}/process-image`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Accept': 'application/json',
-        },
-      })
-        .then(response => {
-          const processedImage = `data:image/png;base64,${response.data.image}`;
-          const code = response.data.code;
+      try {
+        const response = await axios.post('/api/process-image', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
+          },
+        });
 
-          // Add to workflow
-          setWorkflow(prev => [...prev, {
-            id: Date.now(),
-            filter: filterName,
-            image: processedImage,
-            code: code,
-            description: getFilterDescription(filterName),
-            parameters: params
-          }]);
-        })
-        .catch(error => console.error('Error processing image:', error));
+        const processedImage = `data:image/png;base64,${response.data.image}`;
+        const code = response.data.code;
+
+        // Add to workflow
+        setWorkflow(prev => [...prev, {
+          id: Date.now(),
+          filter: filterName,
+          image: processedImage,
+          code: code,
+          description: getFilterDescription(filterName),
+          parameters: params
+        }]);
+      } catch (error) {
+        console.error('Error processing image:', error);
+        throw error; // Re-throw to handle in Sidebar
+      }
     }
   };
 

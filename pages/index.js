@@ -17,7 +17,7 @@ const Home = () => {
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     setDarkMode(savedDarkMode);
 
-    axios.get('http://127.0.0.1:8000/filters', {
+    axios.get(`${process.env.BACKEND_URL}/filters`, {
       headers: {
         'Accept': 'application/json',
       },
@@ -58,7 +58,7 @@ const Home = () => {
       formData.append('params', JSON.stringify(params));
       formData.append('previous_image', previousImage);
 
-      axios.post('http://127.0.0.1:8000/process-workflow-image', formData, {
+      axios.post(`${process.env.BACKEND_URL}/process-workflow-image`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Accept': 'application/json',
@@ -86,7 +86,7 @@ const Home = () => {
       formData.append('filter_name', filterName);
       formData.append('params', JSON.stringify(params));
 
-      axios.post('http://127.0.0.1:8000/process-image', formData, {
+      axios.post(`${process.env.BACKEND_URL}/process-image`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Accept': 'application/json',

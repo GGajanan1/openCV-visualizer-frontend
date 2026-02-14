@@ -9,7 +9,7 @@ const Sidebar = ({ onSelectFilter }) => {
   const [expandedCategories, setExpandedCategories] = useState({});
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/filters')
+    axios.get(`${process.env.BACKEND_URL}/filters`)
       .then(response => setCategories(response.data.categories))
       .catch(error => console.error('Error fetching filters:', error));
   }, []);

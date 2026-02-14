@@ -1,5 +1,7 @@
 import '../styles/globals.css';
 import Head from 'next/head';
+import dotenv from 'dotenv';
+dotenv.config();
 
 function MyApp({ Component, pageProps }) {
   return (

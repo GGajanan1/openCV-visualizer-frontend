@@ -12,7 +12,7 @@ const Lab = () => {
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     setDarkMode(savedDarkMode);
 
-    axios.get('http://127.0.0.1:8000/filters', {
+    axios.get(`${process.env.BACKEND_URL}/filters`, {
       headers: {
         'Accept': 'application/json',
       },

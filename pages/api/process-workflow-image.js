@@ -1,6 +1,7 @@
 export const config = {
   api: {
-    bodyParser: false, // Disable body parser to handle multipart form data
+    bodyParser: false,
+    responseLimit: '50mb',
   },
 };
 
